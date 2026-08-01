@@ -1,16 +1,25 @@
-from ollama import Client
+from __future__ import annotations
 
 from runtime.core.config import config
 
+try:
+    from ollama import Client
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    Client = None
+
 
 class OllamaProvider:
-    def __init__(self):
-        self.client = Client(host=config.ollama_host)
 
-    def chat(self, prompt: str, model: str | None = None):
+    def __init__(self, model):
+        self.model = model
+        self.client = Client(host=config.ollama_host) if Client is not None else None
+
+    def chat(self, prompt: str):
+        if self.client is None:
+            return f"OllamaProvider placeholder for {self.model}: {prompt[:80]}"
 
         response = self.client.chat(
-            model=model or config.default_model,
+            model=self.model,
             messages=[
                 {
                     "role": "user",
@@ -20,6 +29,3 @@ class OllamaProvider:
         )
 
         return response["message"]["content"]
-
-
-ollama_provider = OllamaProvider()
