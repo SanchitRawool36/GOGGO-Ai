@@ -37,8 +37,7 @@ def run_test():
 
 
     # 5. List the directory
-    print("
-Listing...")
+    print("Listing...")
     dir_contents = fs.list_directory(".")
     # Filter for the test file to avoid printing other files in the directory
     if test_file.name in dir_contents:

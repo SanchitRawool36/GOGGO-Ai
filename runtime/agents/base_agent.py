@@ -1,3 +1,4 @@
+from runtime.core.logger import logger
 from runtime.router.model_router import ModelRouter
 from runtime.tasks.inbox import Inbox
 from runtime.tools.tool_manager import ToolManager
@@ -57,9 +58,11 @@ USER
             return "No pending tasks."
 
         task.status = "IN_PROGRESS"
+        logger.info("Agent %s starting task %s", self.name, task.title)
 
         answer = self.run(task.description)
 
         task.status = "COMPLETED"
+        logger.info("Agent %s completed task %s", self.name, task.title)
 
         return answer

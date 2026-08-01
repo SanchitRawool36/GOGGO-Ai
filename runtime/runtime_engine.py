@@ -1,3 +1,4 @@
+from runtime.core.logger import logger
 from runtime.planner.planner import Planner
 from runtime.tasks.task_manager import TaskManager
 from runtime.collaboration.collaboration import Collaboration
@@ -23,33 +24,22 @@ class RuntimeEngine:
 
     def run(self, goal):
 
-        print("=" * 70)
-        print("AI Runtime Started")
-        print("=" * 70)
-
-        print("\nGoal:")
-        print(goal)
-
-        print("\nGenerating Plan...\n")
+        logger.info("AI Runtime Started")
+        logger.info("Goal: %s", goal)
+        logger.info("Generating Plan")
 
         plan = self.planner.create_plan(goal)
-
         tasks = plan["tasks"]
 
-        print(f"{len(tasks)} Tasks Generated\n")
+        logger.info("%s tasks generated", len(tasks))
 
         for task in tasks:
-
             created = self.task_manager.create_task(
-
                 title=task["title"],
-
                 description=task["description"],
-
-                assigned_to=task["agent"]
-
+                assigned_to=task["agent"],
             )
-
+            logger.info("Executing task: %s", created.title)
             self.collaboration.execute(created)
 
-        print("\nRuntime Finished.\n")
+        logger.info("Runtime Finished")
