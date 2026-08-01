@@ -1,6 +1,6 @@
 from runtime.router.model_router import ModelRouter
 from runtime.tasks.inbox import Inbox
-
+from runtime.tools.tool_manager import ToolManager
 
 class BaseAgent:
 
@@ -17,6 +17,7 @@ class BaseAgent:
         self.system_prompt = system_prompt
 
         self.router = ModelRouter(model)
+        self.tools = ToolManager()
         self.inbox = Inbox()
 
     def run(self, task: str):
@@ -32,6 +33,18 @@ USER
 """
 
         return self.router.ask(prompt)
+
+    def python(self):
+        return self.tools.get("python")
+
+    def git(self):
+        return self.tools.get("git")
+
+    def shell(self):
+        return self.tools.get("shell")
+
+    def filesystem(self):
+        return self.tools.get("filesystem")
 
     def assign_task(self, task):
         self.inbox.add(task)

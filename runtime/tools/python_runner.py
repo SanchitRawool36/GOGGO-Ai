@@ -1,33 +1,35 @@
 from pathlib import Path
+import subprocess
 import sys
 
-sys.path.append(str(Path(__file__).resolve().parent))
 
-from filesystem import FileSystemTool
+class PythonRunner:
+    """
+    Executes Python code or Python files.
+    """
 
+    def run(self, code: str):
+        """
+        Execute inline Python code.
+        """
 
-def run_demo() -> str:
-    """Run a simple filesystem smoke test and return a summary message."""
-    fs = FileSystemTool()
-    temp_file = Path("python_runner_demo.txt")
+        result = subprocess.run(
+            [sys.executable, "-c", code],
+            capture_output=True,
+            text=True,
+        )
 
-    if temp_file.exists():
-        temp_file.unlink()
+        return result.stdout if result.stdout else result.stderr
 
-    fs.write_file(temp_file, "Hello from PythonRunner")
-    content = fs.read_file(temp_file)
-    fs.append_file(temp_file, "\nAppended")
-    updated = fs.read_file(temp_file)
-    files = fs.list_directory(".")
+    def run_file(self, filename: str):
+        """
+        Execute a Python file.
+        """
 
-    if temp_file.exists():
-        temp_file.unlink()
+        result = subprocess.run(
+            [sys.executable, filename],
+            capture_output=True,
+            text=True,
+        )
 
-    return (
-        "PythonRunner demo completed. "
-        f"Read={content!r}; Updated={updated!r}; Files={files}"
-    )
-
-
-if __name__ == "__main__":
-    print(run_demo())
+        return result.stdout if result.stdout else result.stderr

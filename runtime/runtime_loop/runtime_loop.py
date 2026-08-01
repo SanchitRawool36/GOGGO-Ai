@@ -1,41 +1,44 @@
-from __future__ import annotations
-
-from typing import Optional
-
-from runtime.collaboration.collaboration import Collaboration
-from runtime.memory.memory_manager import MemoryManager
 from runtime.planner.planner import Planner
-from runtime.tasks.inbox import Inbox
 from runtime.tasks.task_manager import TaskManager
+from runtime.collaboration.collaboration import Collaboration
+from runtime.agents.agent_manager import AgentManager
 
 
 class RuntimeLoop:
-    """Simple orchestration loop for the autonomous runtime."""
 
     def __init__(self):
-        self.inbox = Inbox()
         self.planner = Planner()
-        self.task_manager = TaskManager()
-        self.collaboration = Collaboration()
-        self.memory = MemoryManager()
+        self.tasks = TaskManager()
+        self.agents = AgentManager()
+        self.collaboration = Collaboration(self.agents, self.tasks)
 
-    def run_once(self, goal: str) -> Optional[str]:
-        """Process a single goal through planning, task creation, collaboration, and memory."""
+    def execute(self, goal):
+        print("\n==============================")
+        print("GOAL")
+        print("==============================")
+        print(goal)
+
+        print("\nGenerating plan...\n")
+
         plan = self.planner.create_plan(goal)
-        self.task_manager.create_from_plan(plan)
-        for task in self.task_manager.list_tasks():
+
+        print("Plan Generated.\n")
+
+        created_tasks = []
+
+        for task in plan["tasks"]:
+            new_task = self.tasks.create_task(
+                title=task["title"],
+                description=task["description"],
+                assigned_to=task["agent"],
+            )
+            created_tasks.append(new_task)
+
+        print(f"{len(created_tasks)} tasks created.\n")
+
+        for task in created_tasks:
+            print("=" * 60)
+            print("Executing:", task.title)
             self.collaboration.execute(task)
-        self.memory.save()
-        return plan.goal
 
-    def run_forever(self) -> None:
-        """Run the main loop indefinitely."""
-        while True:
-            goal = self.inbox.next()
-            if goal is None:
-                break
-            self.run_once(goal if isinstance(goal, str) else str(goal))
-
-
-if __name__ == "__main__":
-    RuntimeLoop().run_forever()
+        print("\nRuntime Finished.")

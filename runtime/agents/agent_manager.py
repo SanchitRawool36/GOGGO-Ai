@@ -34,6 +34,9 @@ class AgentManager:
 
         return self.agents[name.lower()]
 
+    def get_agent(self, name: str):
+        return self.get(name)
+
     def delegate(self, agent_name: str, task: str):
         agent = self.get(agent_name)
         return agent.run(task)

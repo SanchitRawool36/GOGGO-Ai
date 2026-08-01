@@ -1,10 +1,12 @@
 from runtime.agents.agent_manager import AgentManager
 from runtime.tasks.task import Task
 
+
 class Collaboration:
 
-    def __init__(self):
-        self.manager = AgentManager()
+    def __init__(self, agents=None, tasks=None):
+        self.manager = agents or AgentManager()
+        self.tasks = tasks
 
     def execute(self, task: Task):
         # Step 1: CEO delegates the task to the CTO
